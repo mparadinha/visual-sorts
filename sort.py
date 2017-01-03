@@ -138,7 +138,61 @@ def insertion(array):
 
 def merge(array): pass
 def heap(array): pass
-def quick(array): pass
+
+def partition(array, first, last):
+    aux = array[last]
+    i = first - 1
+    j = last
+    
+    while True:
+        i += 1
+        j -= 1
+        while array[i] < aux and i <= j:
+            i += 1
+        while aux < array[j] and j >= i:
+            j -= 1
+        if i >= j: break
+        array[i], array[j] = array[j], array[i]
+        #yield(array[i], array[j])
+        
+    array[i], array[last] = array[last], array[i]
+    #yield(array[i], array[last])
+    
+    return i
+
+def quick(array):
+    stack = []
+    stack.extend((0, len(array) - 1))
+    while stack:
+        r = stack.pop()
+        l = stack.pop()
+        if r <= l: continue
+        
+        i = partition(array, l, r)
+        if i - l > r - i:
+            stack.extend((l, i - 1, i + 1, r))
+        else:
+            stack.extend((i + 1, r, l, i - 1))
+        yield(l, r)
+        
+    yield(l, r)
+        
+
+# basically, a generalized insertion sort
+def shell(array):
+    gaps = [1, 8, 23, 77, 281, 1073, 4193] # one of the fastest sequences 
+    
+    for h in reversed(gaps):
+        for i in range(h, len(array)):
+            aux = array[i]
+            j = i
+            while j >= h and array[j - h] > aux:
+                array[j - h], array[j] = array[j], array[j - h]
+                yield(j, j - h)
+                j -= h
+            array[j] = aux
+             
+    
 
 # there must be a better way!
 sorts = {"bubble": bubble,
@@ -147,6 +201,7 @@ sorts = {"bubble": bubble,
          "insertion": insertion,
          "merge": merge,
          "heap": heap,
-         "quick": quick}
+         "quick": quick,
+         "shell": shell}
 
 main()
