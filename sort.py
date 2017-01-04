@@ -11,9 +11,13 @@ def main(args):
     screen = pygame.display.set_mode((500 + 200, 500 + 2))
     clock = pygame.time.Clock()
 
-    # the 100 random numbers
-    array = list(range(1, 101))
-    shuffle(array)
+    if args.data == "reverse":
+        array = list(reversed(range(1, 101)))
+    elif args.data == "almost sorted":
+        array = list(range(1, 101))
+    else:
+        array = list(range(1, 101))
+        shuffle(array)
 
     # check if requested sort is available
     if not args.algorithm in sorts:
@@ -270,13 +274,16 @@ sorts = {"bubble": bubble,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Visualisation of sorting algorithms build with Python and pygame")
+        description="Visualisation of sorting algorithms built with Python and pygame")
 
     parser.add_argument("algorithm", type=str, default="bubble", nargs="?",
-        help="Algorithm to use when sorting array ({})".format(", ".join(sorts.keys())))
+        help="algorithm to use when sorting array ({})".format(", ".join(sorts.keys())))
 
     parser.add_argument("--wait", type=int,
-        help="Time to wait (in milliseconds) between each step of the sort.")
+        help="time to wait (in milliseconds) between each step of the sort.")
+
+    parser.add_argument("--data", type=str, default="random",
+        help="type of input data (random, reverse)")
 
     args = parser.parse_args()
     main(args)
