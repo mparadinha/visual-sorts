@@ -1,34 +1,32 @@
 import sys
 from random import randint, shuffle
+import argparse
 
 import pygame
 from pygame.locals import *
 
-def main():
-    if len(sys.argv) < 2:
-        print("usage: python sort.py [<sort type>] [--wait=WAIT_TIME]")
-        print("sorts:", ", ".join(sorts.keys()))
-        print("e.g: python sort.py insertion --wait=25")
+def main(args):
+    wait_time = args.wait
 
     screen = pygame.display.set_mode((500 + 200, 500 + 2))
     clock = pygame.time.Clock()
-
-    wait_time = None
-    for arg in sys.argv:
-        if "--wait" in arg: wait_time = int(arg.split("=")[-1])
-    args = [arg for arg in sys.argv if "--wait" not in arg]
 
     # the 100 random numbers
     array = list(range(1, 101))
     shuffle(array)
 
-    # sort algorithm default to bubble sort
-    if args[-1] in sorts: sort = sorts[args[-1]]
+    # check if requested sort is available
+    if not args.algorithm in sorts:
+        print(args.algorithm, "is not a valid sort. The options are:", ", ".join(sorts.keys()))
     else:
-        print("no sort specified. defaulting to bubble sort")
-        sort = bubble
+        sort = args.algorithm
 
+    # fetch function for sort algorithm
+    sort = sorts[sort]
+
+    # first show unsorted array before starting
     show_array(screen, array, tuple())
+
     for tested in sort(array):
         screen.fill((0, 0, 0))
         show_array(screen, array, tested)
@@ -42,6 +40,7 @@ def main():
         # wait before drawing the next iteration
         if wait_time: pygame.time.wait(wait_time)
 
+    # do the cool animation at the end
     draw_completed_array(screen, array)
     
     # wait for key press before closing
@@ -51,12 +50,12 @@ def main():
                 pygame.quit()
                 return
 
-def show_array(screen, array, tested):
+def show_array(screen, array, highlights):
     x = 1
     for i, val in enumerate(array):
         y = val * 5
         # green bars for current bars. white for all others
-        color = (0, 255, 0) if i in tested else (255, 255, 255)
+        color = (0, 255, 0) if i in highlights else (255, 255, 255)
 
         pygame.draw.rect(screen, color, pygame.Rect(x, 501 - y, 5, y))
         x += 7
@@ -220,4 +219,15 @@ sorts = {"bubble": bubble,
          "quick": quick,
          "shell": shell}
 
-main()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Visualisation of sorting algorithms build with Python and pygame")
+
+    parser.add_argument("algorithm", type=str, default="bubble", nargs="?",
+        help="Algorithm to use when sorting array ({})".format(", ".join(sorts.keys())))
+
+    parser.add_argument("--wait", type=int, metavar="wait_time",
+        help="Time to wait (in milliseconds) between each step of the sort.")
+
+    args = parser.parse_args()
+    main(args)
