@@ -154,9 +154,34 @@ def insertion(array):
                 break
         yield (j,)
 
-def merge(array): pass
+def fix_down(array, idx, end):
+    while 2 * idx < end - 1:
+        child = 2 * idx + 1
+        
+        if child < end - 1 and array[child] < array[child + 1]: child += 1
+        if array[idx] < array[child]:
+            array[idx], array[child] = array[child], array[idx]
+        
+        idx = child
+        
+    return array
+
+def heap(array):
+    start = (len(array) - 2) // 2
     
-def heap(array): pass
+    while start >= 0:
+        array = fix_down(array, start, len(array) - 1)
+        start -= 1
+        
+    last = len(array) - 1
+    
+    while last > 0:
+        array[last], array[0] = array[0], array[last]
+        array = fix_down(array, 0, last)
+        last -= 1
+        yield(0, last) # placeholder; need to figure out a way to take child and idx from fix_down
+    
+def merge(array): pass
 
 def partition(array, first, last):
     aux = array[last]
@@ -207,7 +232,29 @@ def shell(array):
                 j -= h
             array[j] = aux
              
+def bogo(array):
+    """ included just because it's hilarious(ly ineffective). O(n!) complexity 
+        might be a lot more effective with a custom-made check-if-sorted function
+        but I didn't think it would matter much in this case. """
     
+    while sorted(array) != array:
+        shuffle(array)
+        yield(1, 2) # another placeholder -> I'm not really sure how to fix this one...
+
+def comb(array):
+    h = len(array) - 1 
+    switched = True
+    shrink = 1.25
+    
+    while h > 1:
+        h = int(h // shrink)
+        
+        i = 0
+        while i + h < len(array):
+            if array[i] > array[i + h]:
+                array[i], array[i + h] = array[i + h], array[i]
+                yield(i, i + h)
+            i += 1
 
 # there must be a better way!
 sorts = {"bubble": bubble,
@@ -217,7 +264,9 @@ sorts = {"bubble": bubble,
          "merge": merge,
          "heap": heap,
          "quick": quick,
-         "shell": shell}
+         "shell": shell,
+         "bogo": bogo,
+         "comb": comb}
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
