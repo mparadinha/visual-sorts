@@ -275,7 +275,7 @@ if __name__ == "__main__":
     parser.add_argument("algorithm", type=str, default="bubble", nargs="?",
         help="Algorithm to use when sorting array ({})".format(", ".join(sorts.keys())))
 
-    parser.add_argument("--wait", type=int, metavar="wait_time",
+    parser.add_argument("--wait", type=int,
         help="Time to wait (in milliseconds) between each step of the sort.")
 
     args = parser.parse_args()
