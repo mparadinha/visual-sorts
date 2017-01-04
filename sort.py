@@ -239,7 +239,7 @@ def bogo(array):
     
     while sorted(array) != array:
         shuffle(array)
-        yield(1, 2) # another placeholder -> I'm not really sure how to fix this one...
+        yield tuple() # returns an empty tuple just to draw the array
 
 def comb(array):
     h = len(array) - 1 
