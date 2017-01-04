@@ -42,6 +42,8 @@ def main():
         # wait before drawing the next iteration
         if wait_time: pygame.time.wait(wait_time)
 
+    draw_completed_array(screen, array)
+    
     # wait for key press before closing
     while True:
         for event in pygame.event.get():
@@ -60,6 +62,23 @@ def show_array(screen, array, tested):
         x += 7
 
     pygame.display.update()
+    
+def draw_completed_array(screen, array):
+    x = 1
+    
+    # this is just because the switching looks ugly otherwise
+    # because the last switched indexes are still green
+    show_array(screen, array, ())
+    
+    for i, val in enumerate(array):
+        y = val * 5
+        color = (0, 255, 0)
+
+        pygame.draw.rect(screen, color, pygame.Rect(x, 501 - y, 5, y))
+        x += 7
+        
+        pygame.time.wait(5)
+        pygame.display.update()
 
 def bubble(array):
     rounds = len(array)
@@ -137,6 +156,7 @@ def insertion(array):
         yield (j,)
 
 def merge(array): pass
+    
 def heap(array): pass
 
 def partition(array, first, last):
@@ -147,40 +167,36 @@ def partition(array, first, last):
     while True:
         i += 1
         j -= 1
-        while array[i] < aux and i <= j:
-            i += 1
-        while aux < array[j] and j >= i:
-            j -= 1
+        while array[i] < aux and i <= j: i += 1
+        while aux < array[j] and j >= i: j -= 1
         if i >= j: break
         array[i], array[j] = array[j], array[i]
-        #yield(array[i], array[j])
         
     array[i], array[last] = array[last], array[i]
-    #yield(array[i], array[last])
     
     return i
 
 def quick(array):
+    """ not recursive because yield would stop working """
+    
     stack = []
     stack.extend((0, len(array) - 1))
     while stack:
-        r = stack.pop()
-        l = stack.pop()
-        if r <= l: continue
+        right = stack.pop()
+        left = stack.pop()
+        if right <= left: continue
         
-        i = partition(array, l, r)
-        if i - l > r - i:
-            stack.extend((l, i - 1, i + 1, r))
+        i = partition(array, left, right)
+        yield(i, right) # this doesn't work like the other ones yet, working on it
+        if i - left > right - i:
+            stack.extend((left, i - 1, i + 1, right))
         else:
-            stack.extend((i + 1, r, l, i - 1))
-        yield(l, r)
+            stack.extend((i + 1, right, left, i - 1))
         
-    yield(l, r)
-        
-
-# basically, a generalized insertion sort
 def shell(array):
-    gaps = [1, 8, 23, 77, 281, 1073, 4193] # one of the fastest sequences 
+    """ shellsort is basically a more general version of insertion sort 
+    the gaps array is one of the simplest sequences """
+    gaps = [1, 8, 23, 77, 281, 1073, 4193]
     
     for h in reversed(gaps):
         for i in range(h, len(array)):
