@@ -1,5 +1,5 @@
 import sys
-from random import randint, shuffle
+from random import randint, shuffle, sample
 import argparse
 
 import pygame
@@ -13,11 +13,16 @@ def main(args):
 
     if args.data == "reverse":
         array = list(reversed(range(1, 101)))
-    elif args.data == "almost sorted":
+    elif args.data == "almost":
         array = list(range(1, 101))
-    else:
+        i, j = sample(array, 2) # select two distinct random indexes two switch
+        array[i], array[j] = array[j], array[i] # switch the two numbers
+    elif args.data == "random":
         array = list(range(1, 101))
         shuffle(array)
+    else:
+        print(args.data, "is not a valid option for --data. Check sort.py -h for help")
+        sys.exit()
 
     # check if requested sort is available
     if not args.algorithm in sorts:
@@ -39,6 +44,9 @@ def main(args):
         # check if window was closed
         for event in pygame.event.get():
             if event.type == QUIT:
+                pygame.quit()
+                return
+            elif event.type == KEYUP and event.key == K_q:
                 pygame.quit()
                 return
 
@@ -284,7 +292,7 @@ if __name__ == "__main__":
         help="time to wait (in milliseconds) between each step of the sort.")
 
     parser.add_argument("--data", type=str, default="random",
-        help="type of input data (random, reverse)")
+        help="type of input data (random, reverse, almost)")
 
     args = parser.parse_args()
     main(args)
