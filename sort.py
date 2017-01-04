@@ -22,6 +22,7 @@ def main(args):
     # check if requested sort is available
     if not args.algorithm in sorts:
         print(args.algorithm, "is not a valid sort. The options are:", ", ".join(sorts.keys()))
+        sys.exit()
     else:
         sort = args.algorithm
 
