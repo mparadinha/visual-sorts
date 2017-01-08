@@ -8,17 +8,18 @@ from pygame.locals import *
 def main(args):
     wait_time = args.wait
 
-    screen = pygame.display.set_mode((500 + 200, 500 + 2))
+    screen = pygame.display.set_mode((700, 500 + 2))
     clock = pygame.time.Clock()
+    size = args.size
 
     if args.data == "reverse":
-        array = list(reversed(range(1, 101)))
+        array = list(reversed(range(1, size + 1)))
     elif args.data == "almost":
-        array = list(range(1, 101))
+        array = list(range(1, size + 1))
         i, j = sample(array, 2) # select two distinct random indexes two switch
         array[i], array[j] = array[j], array[i] # switch the two numbers
     elif args.data == "random":
-        array = list(range(1, 101))
+        array = list(range(1, size + 1))
         shuffle(array)
     else:
         print(args.data, "is not a valid option for --data. Check sort.py -h for help")
@@ -65,29 +66,35 @@ def main(args):
 
 def show_array(screen, array, highlights):
     x = 1
+    bar_size = round((700 / (1.4 * len(array) - 1)))
+    space = round(0.4 * bar_size)
+    
     for i, val in enumerate(array):
-        y = val * 5
+        y = round((500 * val) / len(array))
+        print(i, val, x, y)
         # green bars for current bars. white for all others
         color = (0, 255, 0) if i in highlights else (255, 255, 255)
 
-        pygame.draw.rect(screen, color, pygame.Rect(x, 501 - y, 5, y))
-        x += 7
+        pygame.draw.rect(screen, color, pygame.Rect(x, 501 - y, bar_size, y))
+        x += bar_size + space
 
     pygame.display.update()
     
 def draw_completed_array(screen, array):
     x = 1
+    bar_size = round((700 / (1.4 * len(array) - 1)))
+    space = round(0.4 * bar_size)
     
     # this is just because the switching looks ugly otherwise
     # because the last switched indexes are still green
     show_array(screen, array, ())
     
     for i, val in enumerate(array):
-        y = val * 5
+        y = (500 * val) // len(array)
         color = (0, 255, 0)
 
-        pygame.draw.rect(screen, color, pygame.Rect(x, 501 - y, 5, y))
-        x += 7
+        pygame.draw.rect(screen, color, pygame.Rect(x, 501 - y, bar_size, y))
+        x += bar_size + space
         
         pygame.time.wait(5)
         pygame.display.update()
@@ -293,6 +300,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--data", type=str, default="random",
         help="type of input data (random, reverse, almost)")
+        
+    parser.add_argument("--size", type=int, default=100,
+        help="size of to-be-sorted array")
 
     args = parser.parse_args()
     main(args)
