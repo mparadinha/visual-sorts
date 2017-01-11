@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 from random import randint, shuffle, sample
 import argparse
