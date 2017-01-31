@@ -181,17 +181,18 @@ def comb(array, display):
             i += 1
 
 
-def join(array, l, m, r, aux):
-    k=l
+def join(array, l, m, r, aux, display):
+    k = l
     i, j = l, m
 
-    while k<r:
+    while k < r:
         if i < m and (j >= r or array[i] <= array[j]):
             aux[k] = array[i]
             i += 1
         else:
             aux[k] = array[j]
             j += 1
+        display.print(array, (i, j))
 
         k += 1
 
@@ -209,10 +210,9 @@ def mergesort(array, l, r, aux, display):
     mergesort(array, l, m, aux, display)
     mergesort(array, m, r, aux, display)
     display.print(array, ())
-    return join(array, l, m, r, aux)
+    return join(array, l, m, r, aux, display)
 
 
 def merge(array, display):
-    print(len(array))
     aux = list(range(len(array)))
     mergesort(array, 0, len(array), aux, display)
