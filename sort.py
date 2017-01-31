@@ -1,17 +1,15 @@
 #!/usr/bin/python3
 
 import sys
-from random import randint, shuffle, sample
+from random import sample
 import argparse
 
-import pygame
-from pygame.locals import *
+from sorts import *
+from display import Display
 
 def main(args):
-    wait_time = args.wait
 
-    screen = pygame.display.set_mode((700, 500 + 2))
-    clock = pygame.time.Clock()
+    display = Display(args.wait)
     size = args.size
 
     if args.data == "reverse":
@@ -23,7 +21,7 @@ def main(args):
     elif args.data == "random":
         array = list(range(1, size + 1))
         shuffle(array)
-    #TODO:
+    #TODO: Add semi-ordered
     else:
         print(args.data, "is not a valid option for --data. Check sort.py -h for help")
         sys.exit()
@@ -39,33 +37,14 @@ def main(args):
     sort = sorts[sort]
 
     # first show unsorted array before starting
-    show_array(screen, array, tuple())
+    display.print(array, tuple())
 
-    for tested in sort(array):
-        screen.fill((0, 0, 0))
-        show_array(screen, array, tested)
-
-        # check if window was closed
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                return
-            elif event.type == KEYUP and event.key == K_q:
-                pygame.quit()
-                return
-
-        # wait before drawing the next iteration
-        if wait_time: pygame.time.wait(wait_time)
+    sort(array, display)
 
     # do the cool animation at the end
-    draw_completed_array(screen, array)
+    display.draw_completed_array(array)
 
-    # wait for key press before closing
-    while True:
-        for event in pygame.event.get():
-            if event.type in [QUIT, KEYUP]:
-                pygame.quit()
-                return
+    return
 
 
 # there must be a better way!
