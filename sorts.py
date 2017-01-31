@@ -1,4 +1,6 @@
-def bubble(array):
+from random import shuffle
+
+def bubble(array, display):
     rounds = len(array)
     switched = True
     last = rounds - 1 # last switched index
@@ -11,11 +13,12 @@ def bubble(array):
                 array[i], array[i + 1] = array[i + 1], array[i]
                 switched = True
                 last = i + 1
-            yield (i, i + 1)
+            display.print(array, (i, i+1))
+            #yield (i, i + 1)
 
         rounds = last
 
-def cocktail(array):
+def cocktail(array, display):
     """kinda like bubble sort only it works both ways"""
     start, end = 0, len(array) - 1
     switched = True
@@ -31,7 +34,7 @@ def cocktail(array):
                 array[i], array[i + 1] = array[i + 1], array[i]
                 last = i + 1
                 switched = True
-            yield (i, i + 1)
+            display.print(array, (i, i + 1))
         end = last
         if not switched: break # no switches, list is ordered
 
@@ -42,10 +45,10 @@ def cocktail(array):
                 array[i], array[i + 1] = array[i + 1], array[i]
                 first = i
                 switched = True
-            yield (i, i + 1)
+            display.print(array, (i, i + 1))
         start = first
 
-def selection(array):
+def selection(array, display):
 
     n = len(array)
     for j in range(n - 1):
@@ -54,24 +57,24 @@ def selection(array):
         imin = j
         for i in range(j + 1, n):
             if array[i] < array[imin]: imin = i
-            yield (j, i, imin)
+            display.print(array, (j, i, imin))
 
         if imin != j:
             array[j], array[imin] = array[imin], array[j]
-            yield (j, imin)
+            display.print(array, (j, imin))
 
-def insertion(array):
+def insertion(array, display):
 
     n = len(array)
     for i in range(1, n):
         if array[i] > array[i - 1]: continue
 
         for j in range(0, i):
-            yield (j, i)
+            display.print(array, (j, i))
             if array[i] < array[j]:
                 array.insert(j, array.pop(i))
                 break
-        yield (j,)
+        display.print(array, (j,))
 
 def fix_down(array, idx, end):
     while 2 * idx < end - 1:
@@ -85,7 +88,7 @@ def fix_down(array, idx, end):
 
     return array
 
-def heap(array):
+def heap(array, display):
     start = (len(array) - 2) // 2
 
     while start >= 0:
@@ -98,7 +101,8 @@ def heap(array):
         array[last], array[0] = array[0], array[last]
         array = fix_down(array, 0, last)
         last -= 1
-        yield(0, last) # placeholder; need to figure out a way to take child and idx from fix_down
+        # placeholder; need to figure out a way to take child and idx from fix_down
+        display.print(array, (0, last))
 
 
 def partition(array, first, last):
@@ -118,7 +122,7 @@ def partition(array, first, last):
 
     return i
 
-def quick(array):
+def quick(array, display):
     """ not recursive because yield would stop working """
 
     stack = []
@@ -129,13 +133,14 @@ def quick(array):
         if right <= left: continue
 
         i = partition(array, left, right)
-        yield(i, right) # this doesn't work like the other ones yet, working on it
+        # this doesn't work like the other ones yet, working on it
+        display.print(array, (i, right))
         if i - left > right - i:
             stack.extend((left, i - 1, i + 1, right))
         else:
             stack.extend((i + 1, right, left, i - 1))
 
-def shell(array):
+def shell(array, display):
     """ shellsort is basically a more general version of insertion sort
     the gaps array is one of the simplest sequences """
     gaps = [1, 8, 23, 77, 281, 1073, 4193]
@@ -146,20 +151,21 @@ def shell(array):
             j = i
             while j >= h and array[j - h] > aux:
                 array[j - h], array[j] = array[j], array[j - h]
-                yield(j, j - h)
+                display.print(array, (j, j - h))
                 j -= h
             array[j] = aux
 
-def bogo(array):
+def bogo(array, display):
     """ included just because it's hilarious(ly ineffective). O(n!) complexity
         might be a lot more effective with a custom-made check-if-sorted function
         but I didn't think it would matter much in this case. """
 
     while sorted(array) != array:
         shuffle(array)
-        yield tuple() # returns an empty tuple just to draw the array
+        # returns an empty tuple just to draw the array
+        display.print(array, tuple())
 
-def comb(array):
+def comb(array, display):
     h = len(array) - 1
     switched = True
     shrink = 1.25
@@ -171,35 +177,42 @@ def comb(array):
         while i + h < len(array):
             if array[i] > array[i + h]:
                 array[i], array[i + h] = array[i + h], array[i]
-                yield(i, i + h)
+                display.print(array, (i, i + h))
             i += 1
 
 
-def mergesort(left, right):
-    sorted = []
-    while left or right:
-        if not left:
-            sorted.append(right.pop())
-        elif not right:
-            sorted.append(left.pop())
-        else:
-            if left[-1] > right[-1]:
-                sorted.append(left.pop())
-            else:
-                sorted.append(right.pop())
-    return list(reversed(sorted))
+def join(array, l, m, r, aux):
+    k=l
+    i, j = l, m
 
-def merge(array):
-    if len(array) < 2:
-        return array
-    middle = len(array)//2
-    left = mergesort(array[:middle])
-    right = mergesort(array[middle:])
-    return merge(left, right)
-def merge(array):
-    stack = []
-    if len(array > 1):
-        middle = len(array)/2
-        left = merge(array[0:middle])
-        right = merge(array[middle:-1])
-    return join(left, right)
+    while k<r:
+        if i < m and (j >= r or array[i] <= array[j]):
+            aux[k] = array[i]
+            i += 1
+        else:
+            aux[k] = array[j]
+            j += 1
+
+        k += 1
+
+    k = l
+    while k < r:
+        array[k] = aux[k]
+        k += 1
+
+
+def mergesort(array, l, r, aux, display):
+    if r-l < 2:
+        return
+
+    m = (r+l)//2
+    mergesort(array, l, m, aux, display)
+    mergesort(array, m, r, aux, display)
+    display.print(array, ())
+    return join(array, l, m, r, aux)
+
+
+def merge(array, display):
+    print(len(array))
+    aux = list(range(len(array)))
+    mergesort(array, 0, len(array), aux, display)
